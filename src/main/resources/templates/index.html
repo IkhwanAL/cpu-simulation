@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${title}">CPU Sim</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+  <h1 th:text="${title}">CPU Simulator</h1>
+
+  <div id="editor">
+    <h2>Program</h2>
+    <textarea rows="10" cols="80">
+      LOAD A, 5
+      ADD A, 3
+      STORE A, 0x100
+    </textarea>
+  </div>
+
+  <div id="terminal">
+    <h2>CPU State</h2>
+    <pre>
+      Register A: <span th:text="${registerA}">0</span>
+      Register B: <span th:text="${registerB}">0</span>
+    </pre>
+  </div>
+
+</body>
+
+</html>
