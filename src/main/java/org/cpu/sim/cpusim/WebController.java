@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class WebController {
+  Parser parser = new Parser();
 
   @GetMapping("/")
   public String index(Model model) {
@@ -29,7 +30,7 @@ public class WebController {
   }
 
   Instruction parse(String line) {
-    return Parser.parse(line);
+    return parser.parse(line);
   }
 
   @PostMapping("/compile-run")
@@ -50,8 +51,12 @@ public class WebController {
     model.addAttribute("registerC", cpu.reg.r[2]);
     model.addAttribute("registerD", cpu.reg.r[3]);
 
-    IO.println(program);
     model.addAttribute("program", program);
+
+    if (cpu.fault != CpuFault.None) {
+      var error = parser.parseError(cpu.fault);
+      model.addAttribute("error", error);
+    }
     return "index";
   }
 }

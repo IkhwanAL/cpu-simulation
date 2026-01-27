@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title th:text="${title}">CPU Sim</title>
   <link rel="stylesheet" th:href="@{/css/style.css}">
-  <script th:src="@{/js/textarea.js}"></script>
+  <!-- <script th:src="@{/js/textarea.js}"></script> -->
 </head>
 
 <body>
@@ -24,6 +24,9 @@ HALT">
     </div>
 
   </form>
+  <div class="error-box">
+    <p th:text="${error}" class="text-error"></p>
+  </div>
   <div id="terminal">
     <h2>CPU State</h2>
     <div id="register">

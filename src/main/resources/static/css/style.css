@@ -26,3 +26,11 @@ textarea {
   margin-left: 5px;
   margin-right: 5px;
 }
+
+.error-box {
+  width: 100%;
+}
+
+.text-error {
+  color: red;
+}
