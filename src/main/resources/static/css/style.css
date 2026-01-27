@@ -1,17 +1,28 @@
 body {
-    font-family: monospace;
-    background: #111;
-    color: #eee;
+  font-family: monospace;
+  background: #111;
+  color: #eee;
+  margin: 0;
 }
 
 textarea {
-    width: 100%;
-    background: #000;
-    color: #0f0;
+  width: 100%;
+  background: #000;
+  color: #0f0;
 }
 
 #terminal {
-    margin-top: 20px;
-    background: #000;
-    padding: 10px;
+  margin-top: 20px;
+  background: #000;
+  padding: 10px;
+}
+
+#register {
+  display: flex;
+  flex-direction: row;
+}
+
+#register>div {
+  margin-left: 5px;
+  margin-right: 5px;
 }
