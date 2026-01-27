@@ -3,7 +3,7 @@ package org.cpu.sim.cpusim;
 import java.util.ArrayList;
 
 enum OpCode {
-  LOAD, STORE, ADD, JMP, HALT;
+  LOAD, STORE, ADD, JMP, HALT, JZ;
 
   static OpCode fromString(String cmd) {
     try {
@@ -44,6 +44,7 @@ class Parser {
         break;
       case JMP:
         ins.dest = Integer.parseInt(cmd[1]);
+        break;
       case STORE:
         ins.dest = parseRegister(cmd[1]);
         ins.src = Integer.decode(cmd[2]);
@@ -55,6 +56,9 @@ class Parser {
       case ADD:
         ins.dest = parseRegister(cmd[1]);
         ins.src = parseRegister(cmd[2]);
+        break;
+      case JZ:
+        ins.dest = Integer.parseInt(cmd[1]);
         break;
       case null:
       default:
@@ -96,19 +100,7 @@ public class CpuLand {
   ArrayList<Instruction> program = new ArrayList<Instruction>();
 
   public void tick() {
-    if (programCounter < 0) {
-      halted = true;
-      fault = CpuFault.INVALID_PC;
-      return;
-    }
-
-    if (program.size() < 0) {
-      halted = true;
-      fault = CpuFault.INVALID_PC;
-      return;
-    }
-
-    if (programCounter > program.size()) {
+    if (programCounter < 0 || programCounter >= program.size()) {
       halted = true;
       fault = CpuFault.INVALID_PC;
       return;
