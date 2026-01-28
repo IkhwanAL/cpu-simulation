@@ -1,7 +1,5 @@
 package org.cpu.sim.cpusim;
 
-import java.util.Arrays;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,8 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class WebController {
-  Parser parser = new Parser();
-
   @GetMapping("/")
   public String index(Model model) {
     model.addAttribute("title", "Cpu Simulator");
@@ -29,19 +25,14 @@ public class WebController {
 
   }
 
-  Instruction parse(String line) {
-    return parser.parse(line);
-  }
-
   @PostMapping("/compile-run")
   public String getInstruction(@RequestParam String program, Model model) {
-    var cpu = new CpuLand();
+    var cpu = new Cpu();
 
-    var programText = Arrays.stream(program.split("\r\n"));
+    cpu.cu.fetchProgram(program);
+    cpu.program = cpu.cu.decode();
 
-    programText.filter(l -> !l.isBlank()).map(this::parse).forEach(i -> cpu.program.add(i));
-
-    while (!cpu.halted) {
+    while (!cpu.alu.halted) {
       cpu.tick();
     }
 
@@ -53,8 +44,8 @@ public class WebController {
 
     model.addAttribute("program", program);
 
-    if (cpu.fault != CpuFault.None) {
-      var error = parser.parseError(cpu.fault);
+    if (cpu.alu.fault != CpuFault.None) {
+      var error = cpu.cu.parseError(cpu.alu.fault);
       model.addAttribute("error", error);
     }
     return "index";
