@@ -25,17 +25,7 @@ public class WebController {
 
   }
 
-  @PostMapping("/compile-run")
-  public String getInstruction(@RequestParam String program, Model model) {
-    var cpu = new Cpu();
-
-    cpu.cu.fetchProgram(program);
-    cpu.program = cpu.cu.decode();
-
-    while (!cpu.alu.halted) {
-      cpu.tick();
-    }
-
+  private void setModel(Cpu cpu, String program, Model model) {
     model.addAttribute("title", "Cpu Simulator");
     model.addAttribute("registerA", cpu.reg.r[0]);
     model.addAttribute("registerB", cpu.reg.r[1]);
@@ -43,6 +33,27 @@ public class WebController {
     model.addAttribute("registerD", cpu.reg.r[3]);
 
     model.addAttribute("program", program);
+  }
+
+  @PostMapping("/compile-run")
+  public String getInstruction(@RequestParam String program, Model model) {
+    var cpu = new Cpu();
+
+    cpu.cu.fetchProgram(program);
+
+    try {
+      cpu.program = cpu.cu.decode();
+    } catch (IllegalStateException e) {
+      setModel(cpu, program, model);
+      model.addAttribute("error", "failed to parse program");
+      return "index";
+    }
+
+    while (!cpu.alu.halted) {
+      cpu.tick();
+    }
+
+    setModel(cpu, program, model);
 
     if (cpu.alu.fault != CpuFault.None) {
       var error = cpu.cu.parseError(cpu.alu.fault);
