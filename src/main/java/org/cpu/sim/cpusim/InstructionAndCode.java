@@ -21,3 +21,18 @@ class Instruction {
   int dest;
   int src;
 }
+
+sealed interface Operand permits Immediate, LabelRef, HexCode, RegisterCode {
+}
+
+record Immediate(int value) implements Operand {
+}
+
+record HexCode(String value) implements Operand {
+}
+
+record RegisterCode(String value) implements Operand {
+}
+
+record LabelRef(String name) implements Operand {
+}

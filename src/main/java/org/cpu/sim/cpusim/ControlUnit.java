@@ -2,20 +2,40 @@ package org.cpu.sim.cpusim;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.stream.Stream;
 
 public class ControlUnit {
   Stream<String> programInstruction;
+  HashMap<String, Integer> labels = new HashMap<String, Integer>();
+  int instructionLine = 0;
+
+  class RawInstruction {
+    OpCode opcode;
+    Operand dest;
+    Operand src;
+  }
 
   void fetchProgram(String program) {
     programInstruction = Arrays.stream(program.split("\r\n"));
   }
 
   ArrayList<Instruction> decode() {
-    return new ArrayList<Instruction>(programInstruction
+    var rawInstruction = new ArrayList<RawInstruction>(programInstruction
         .filter(l -> !l.isBlank())
         .map(this::parse)
         .toList());
+
+    var compiledInstruction = new ArrayList<Instruction>();
+
+    for (RawInstruction instruction : rawInstruction) {
+      if (instruction.opcode == null) {
+        continue;
+      }
+      compiledInstruction.add(this.resolver(instruction));
+    }
+
+    return compiledInstruction;
   }
 
   private int parseRegister(String cmd) {
@@ -33,38 +53,122 @@ public class ControlUnit {
     }
   }
 
-  private Instruction parse(String line) {
-    var cmd = line.replace(",", "").split(" ");
-    var ins = new Instruction();
+  private boolean isNumber(String token) {
+    for (int i = 0; i < token.length(); i++) {
+      if (!Character.isDigit(token.charAt(i)))
+        return false;
+    }
+
+    return !token.isEmpty();
+  }
+
+  private Operand parseOperand(String token) {
+    if (token.isEmpty()) {
+      return null;
+    }
+
+    if (token.startsWith("0x")) {
+      return new HexCode(token);
+    }
+
+    if (isNumber(token)) {
+      return new Immediate(Integer.parseInt(token));
+    }
+
+    if (Register.CODE.contains(token)) {
+      return new RegisterCode(token);
+    }
+
+    return new LabelRef(token);
+  }
+
+  private Boolean detectLabel(String token) {
+    if (token.endsWith(":")) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private RawInstruction parse(String line) {
+    var cmd = line.trim().replace(",", "").split(" ");
+    var ins = new RawInstruction();
     ins.opcode = OpCode.fromString(cmd[0]);
 
+    if (this.detectLabel(cmd[0])) {
+      String label = cmd[0].substring(0, cmd[0].length() - 1);
+      labels.put(label, instructionLine);
+    }
+
+    if (cmd.length > 1) {
+      ins.dest = parseOperand(cmd[1]);
+    }
+
+    if (cmd.length > 2) {
+      ins.src = parseOperand(cmd[2]);
+    }
+
+    instructionLine++;
+
+    return ins;
+  }
+
+  private int resolveInstruction(Operand op) {
+    if (op instanceof LabelRef label) {
+      Integer addr = labels.get(label.name());
+
+      if (addr == null) {
+        throw new IllegalStateException("Unknow Label :" + label.name());
+      }
+
+      return addr;
+    }
+
+    if (op instanceof HexCode hx) {
+      return Integer.decode(hx.value());
+    }
+
+    if (op instanceof Immediate imm) {
+      return imm.value();
+    }
+
+    if (op instanceof RegisterCode rc) {
+      return parseRegister(rc.value());
+    }
+
+    return 0;
+  }
+
+  private Instruction resolver(RawInstruction ins) {
+    var instruction = new Instruction();
+    instruction.opcode = ins.opcode;
     switch (ins.opcode) {
       case HALT:
         break;
       case JMP:
-        ins.dest = Integer.parseInt(cmd[1]);
+        instruction.dest = resolveInstruction(ins.dest);
         break;
       case STORE:
-        ins.dest = parseRegister(cmd[1]);
-        ins.src = Integer.decode(cmd[2]);
+        instruction.dest = resolveInstruction(ins.dest);
+        instruction.src = resolveInstruction(ins.src);
         break;
       case LOAD:
-        ins.dest = parseRegister(cmd[1]);
-        ins.src = Integer.parseInt(cmd[2]);
+        instruction.dest = resolveInstruction(ins.dest);
+        instruction.src = resolveInstruction(ins.src);
         break;
       case ADD:
-        ins.dest = parseRegister(cmd[1]);
-        ins.src = parseRegister(cmd[2]);
+        instruction.dest = resolveInstruction(ins.dest);
+        instruction.src = resolveInstruction(ins.src);
         break;
       case JZ:
-        ins.dest = Integer.parseInt(cmd[1]);
+        instruction.dest = resolveInstruction(ins.dest);
         break;
       case null:
       default:
         break;
     }
 
-    return ins;
+    return instruction;
   }
 
   String parseError(CpuFault fault) {

@@ -1,13 +1,20 @@
 package org.cpu.sim.cpusim;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class ControlUnitTests {
+  ControlUnit cu;
+
+  @BeforeEach
+  void setup() {
+    cu = new ControlUnit();
+  }
+
   @Test
   void fetchProgramTest() {
     var program = "LOAD A, 4\r\n";
 
-    var cu = new ControlUnit();
     cu.fetchProgram(program);
 
     if (cu.programInstruction == null) {
@@ -19,7 +26,6 @@ public class ControlUnitTests {
   void decodeProgramTest() {
     var program = "LOAD A, 4\r\n";
 
-    var cu = new ControlUnit();
     cu.fetchProgram(program);
     var list = cu.decode();
 
@@ -27,11 +33,30 @@ public class ControlUnitTests {
       throw new RuntimeException("Control Unit Failed To Decode");
     }
 
-    program = "LOAD A, 4\r\nLOAD B, 5\r\n, ADD A, B\r\n";
+    program = "LOAD A, 4\r\nLOAD B, 5\r\nADD A, B\r\n";
     cu.fetchProgram(program);
     list = cu.decode();
 
     if (list.size() != 3) {
+      throw new RuntimeException("Control Unit Give an Incorrect Instruction");
+    }
+  }
+
+  @Test
+  void decodeWithLabelTest() {
+    var program = "LOAD A, 4\r\n" +
+        "LOAD B, 1\r\n" +
+        "JMP skip\r\n" +
+        "LOAD C, 1\r\n" +
+        "LOAD D, 2\r\n" +
+        "skip:\r\n" +
+        "ADD A, B\r\n" +
+        "HALT\r\n";
+
+    cu.fetchProgram(program);
+    var list = cu.decode();
+
+    if (list.size() != 7) {
       throw new RuntimeException("Control Unit Give an Incorrect Instruction");
     }
   }
