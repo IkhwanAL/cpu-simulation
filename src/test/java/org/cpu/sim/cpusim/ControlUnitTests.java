@@ -73,7 +73,7 @@ public class ControlUnitTests {
     var list = cu.decode();
 
     if (list.size() != 7) {
-      throw new RuntimeException("Control Unit Give an Incorrect Instruction");
+      throw new RuntimeException("Control Unit Give an Incorrect Instruction When Add Label");
     }
   }
 }
