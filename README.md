@@ -2,6 +2,8 @@
 
 A small CPU simulation project built out of curiosity about how CPUs actually work, and as a way to learn Java by going closer to the metal.
 
+![UI CPU SIM](./doc/ui_v1.png)
+
 ## Description
 
 CPU-SIM is a minimal CPU simulator with:
