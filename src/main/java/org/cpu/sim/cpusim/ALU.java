@@ -33,6 +33,20 @@ public class ALU {
       case JMP:
         programCounter = inst.dest - 1;
         break;
+      case JL:
+        if (flag.negative) {
+          programCounter = inst.dest - 1;
+        } else {
+          programCounter++;
+        }
+        break;
+      case JNZ:
+        if (flag.zero != false) {
+          programCounter = inst.dest - 1;
+        } else {
+          programCounter++;
+        }
+        break;
       case JZ:
         if (flag.zero) {
           programCounter = inst.dest - 1;
@@ -70,11 +84,18 @@ public class ALU {
         mem.ram[inst.src] = reg.r[inst.dest];
         programCounter++;
         break;
+      case SUB:
+        int sub = reg.r[inst.dest] - reg.r[inst.src];
+        reg.r[inst.dest] = sub;
+        flag.zero = (sub == 0);
+        flag.negative = (sub < 0);
+        programCounter++;
+        break;
       case ADD:
-        int res = reg.r[inst.dest] + reg.r[inst.src];
-        reg.r[inst.dest] = res;
-        flag.zero = (res == 0);
-        flag.negative = (res < 0);
+        int add = reg.r[inst.dest] + reg.r[inst.src];
+        reg.r[inst.dest] = add;
+        flag.zero = (add == 0);
+        flag.negative = (add < 0);
         programCounter++;
         break;
       case LOAD:

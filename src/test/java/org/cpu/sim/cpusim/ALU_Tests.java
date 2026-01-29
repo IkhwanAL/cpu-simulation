@@ -29,63 +29,27 @@ public class ALU_Tests {
     instructions.add(instruction);
   }
 
-  private void loadInstrunction(ArrayList<Instruction> instructions, int opA, int value) {
+  private void registerAndValueInstrunction(ArrayList<Instruction> instructions, int opA, int value, OpCode code) {
     var instruction = new Instruction();
-    instruction.opcode = OpCode.LOAD;
+    instruction.opcode = code;
     instruction.dest = opA;
     instruction.src = value;
 
     instructions.add(instruction);
   }
 
-  private void cmpInstrunction(ArrayList<Instruction> instructions, int opA, int opB) {
+  private void bothRegisterInstruction(ArrayList<Instruction> instructions, int opA, int opB, OpCode code) {
     var instruction = new Instruction();
-    instruction.opcode = OpCode.CMP;
+    instruction.opcode = code;
     instruction.dest = opA;
     instruction.src = opB;
 
     instructions.add(instruction);
   }
 
-  private void addInstrunction(ArrayList<Instruction> instructions, int opA, int opB) {
+  private void singleInstrunction(ArrayList<Instruction> instructions, int target, OpCode code) {
     var instruction = new Instruction();
-    instruction.opcode = OpCode.ADD;
-    instruction.dest = opA;
-    instruction.src = opB;
-
-    instructions.add(instruction);
-  }
-
-  private void storeMemInstrunction(ArrayList<Instruction> instructions, int opA, int memIndex) {
-    var instruction = new Instruction();
-    instruction.opcode = OpCode.STOREM;
-    instruction.dest = opA;
-    instruction.src = memIndex;
-
-    instructions.add(instruction);
-  }
-
-  private void loadMemInstrunction(ArrayList<Instruction> instructions, int opA, int memIndex) {
-    var instruction = new Instruction();
-    instruction.opcode = OpCode.LOADM;
-    instruction.dest = opA;
-    instruction.src = memIndex;
-
-    instructions.add(instruction);
-  }
-
-  private void jumpInstrunction(ArrayList<Instruction> instructions, int target) {
-    var instruction = new Instruction();
-    instruction.opcode = OpCode.JMP;
-    instruction.dest = target;
-    instruction.src = 0;
-
-    instructions.add(instruction);
-  }
-
-  private void jumpIfZeroInstrunction(ArrayList<Instruction> instructions, int target) {
-    var instruction = new Instruction();
-    instruction.opcode = OpCode.JZ;
+    instruction.opcode = code;
     instruction.dest = target;
     instruction.src = 0;
 
@@ -103,9 +67,9 @@ public class ALU_Tests {
 
   @Test
   public void loadAndAddTest() {
-    loadInstrunction(program, 0, 1);
-    loadInstrunction(program, 1, 1);
-    addInstrunction(program, 0, 1);
+    registerAndValueInstrunction(program, 0, 1, OpCode.LOAD);
+    registerAndValueInstrunction(program, 1, 1, OpCode.LOAD);
+    bothRegisterInstruction(program, 0, 1, OpCode.ADD);
     haltInstrunction(program);
 
     alu.execute(reg, mem, program);
@@ -118,10 +82,10 @@ public class ALU_Tests {
 
   @Test
   public void storeAndLoadTest() {
-    loadInstrunction(program, 0, 1);
-    loadInstrunction(program, 1, 4);
-    storeMemInstrunction(program, 1, 0);
-    loadMemInstrunction(program, 0, 0);
+    registerAndValueInstrunction(program, 0, 1, OpCode.LOAD);
+    registerAndValueInstrunction(program, 1, 4, OpCode.LOAD);
+    registerAndValueInstrunction(program, 1, 0, OpCode.STOREM);
+    registerAndValueInstrunction(program, 0, 0, OpCode.LOADM);
     haltInstrunction(program);
 
     alu.execute(reg, mem, program);
@@ -139,8 +103,8 @@ public class ALU_Tests {
 
   @Test
   public void jumpTest() {
-    loadInstrunction(program, 0, 1);
-    jumpInstrunction(program, 3);
+    registerAndValueInstrunction(program, 0, 1, OpCode.LOAD);
+    singleInstrunction(program, 3, OpCode.JMP);
     haltInstrunction(program);
 
     if (alu.halted && alu.fault != CpuFault.None) {
@@ -151,11 +115,11 @@ public class ALU_Tests {
 
   @Test
   public void jumpIfZeroTest() {
-    loadInstrunction(program, 0, -3);
-    loadInstrunction(program, 1, 1);
-    addInstrunction(program, 0, 1);
-    jumpIfZeroInstrunction(program, 6);
-    jumpInstrunction(program, 3);
+    registerAndValueInstrunction(program, 0, -3, OpCode.LOAD);
+    registerAndValueInstrunction(program, 1, 1, OpCode.LOAD);
+    bothRegisterInstruction(program, 0, 1, OpCode.ADD);
+    singleInstrunction(program, 6, OpCode.JZ);
+    singleInstrunction(program, 3, OpCode.JMP);
     haltInstrunction(program);
 
     if (alu.halted && alu.fault != CpuFault.None) {
@@ -165,10 +129,25 @@ public class ALU_Tests {
   }
 
   @Test
+  public void jumpIfNotZeroTest() {
+    registerAndValueInstrunction(program, 0, 1, OpCode.LOAD);
+    registerAndValueInstrunction(program, 1, 1, OpCode.LOAD);
+    bothRegisterInstruction(program, 0, 1, OpCode.CMP);
+    singleInstrunction(program, 6, OpCode.JNZ);
+    registerAndValueInstrunction(program, 2, 1, OpCode.LOAD);
+    haltInstrunction(program);
+
+    if (alu.halted && alu.fault != CpuFault.None) {
+      throw new RuntimeException(
+          "ALU Unit is halted, something wrong with jump not zero instruction in test code");
+    }
+  }
+
+  @Test
   public void compareTest() {
-    loadInstrunction(program, 0, 1);
-    loadInstrunction(program, 1, 1);
-    cmpInstrunction(program, 0, 1);
+    registerAndValueInstrunction(program, 0, 1, OpCode.LOAD);
+    registerAndValueInstrunction(program, 1, 1, OpCode.LOAD);
+    bothRegisterInstruction(program, 0, 1, OpCode.CMP);
     haltInstrunction(program);
 
     if (alu.halted && alu.fault != CpuFault.None) {
@@ -179,6 +158,19 @@ public class ALU_Tests {
     if (alu.halted && alu.flag.zero != true) {
       throw new RuntimeException(
           "ALU Unit is halted, something wrong with comparison failed");
+    }
+  }
+
+  @Test
+  public void subTest() {
+    registerAndValueInstrunction(program, 0, 1, OpCode.LOAD);
+    registerAndValueInstrunction(program, 1, 1, OpCode.LOAD);
+    bothRegisterInstruction(program, 0, 1, OpCode.SUB);
+    haltInstrunction(program);
+
+    if (alu.halted && alu.fault != CpuFault.None) {
+      throw new RuntimeException(
+          "ALU Unit is halted, something wrong with cmp instruction in test code");
     }
   }
 }

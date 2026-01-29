@@ -174,11 +174,14 @@ public class ControlUnit {
         instruction.dest = resolveInstruction(ins.dest);
         instruction.src = resolveInstruction(ins.src);
         break;
+      case SUB:
       case CMP:
       case ADD:
         instruction.dest = resolveInstruction(ins.dest);
         instruction.src = resolveInstruction(ins.src);
         break;
+      case JNZ:
+      case JL:
       case JZ:
         instruction.dest = resolveInstruction(ins.dest);
         break;
