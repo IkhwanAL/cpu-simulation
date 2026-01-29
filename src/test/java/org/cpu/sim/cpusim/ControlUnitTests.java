@@ -23,6 +23,22 @@ public class ControlUnitTests {
   }
 
   @Test
+  void decodeProgramwithComment() {
+    var program = "LOAD A, 4\r\n" +
+        "CMP A, B ; this is comment\r\n" +
+        "STOREM A, 0x001\r\n" +
+        "; this is also comment\r\n" +
+        "LOADM A, 0x001\r\n";
+
+    cu.fetchProgram(program);
+    var list = cu.decode();
+
+    if (list.size() != 4) {
+      throw new RuntimeException("Control Unit Give an Incorrect Instruction After Adding Comment");
+    }
+  }
+
+  @Test
   void decodeProgramTest() {
     var program = "LOAD A, 4\r\n";
 
@@ -33,11 +49,11 @@ public class ControlUnitTests {
       throw new RuntimeException("Control Unit Failed To Decode");
     }
 
-    program = "LOAD A, 4\r\nLOAD B, 5\r\nADD A, B\r\n";
+    program = "LOAD A, 4\r\nLOAD B, 5\r\nADD A, B\r\nSTOREM A, 0x001\r\nLOADM A, 0x001\r\n";
     cu.fetchProgram(program);
     list = cu.decode();
 
-    if (list.size() != 3) {
+    if (list.size() != 5) {
       throw new RuntimeException("Control Unit Give an Incorrect Instruction");
     }
   }

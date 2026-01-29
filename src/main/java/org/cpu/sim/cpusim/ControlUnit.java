@@ -22,6 +22,7 @@ public class ControlUnit {
 
   ArrayList<Instruction> decode() {
     var rawInstruction = new ArrayList<RawInstruction>(programInstruction
+        .map(this::stripComment)
         .filter(l -> !l.isBlank())
         .map(this::parse)
         .toList());
@@ -90,9 +91,19 @@ public class ControlUnit {
     return false;
   }
 
+  private String stripComment(String line) {
+    var idx = line.indexOf(";");
+    if (idx >= 0) {
+      line = line.substring(0, idx);
+    }
+
+    return line.trim();
+  }
+
   private RawInstruction parse(String line) {
-    var cmd = line.trim().replace(",", "").split(" ");
+    var cmd = line.replace(",", "").split(" ");
     var ins = new RawInstruction();
+
     ins.opcode = OpCode.fromString(cmd[0]);
 
     if (this.detectLabel(cmd[0])) {
