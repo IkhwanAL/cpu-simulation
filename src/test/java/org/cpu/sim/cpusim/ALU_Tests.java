@@ -65,6 +65,12 @@ public class ALU_Tests {
     }
   }
 
+  void exec() {
+    while (!alu.halted) {
+      alu.execute(reg, mem, program);
+    }
+  }
+
   @Test
   public void loadAndAddTest() {
     registerAndValueInstrunction(program, 0, 1, OpCode.LOAD);
@@ -72,7 +78,7 @@ public class ALU_Tests {
     bothRegisterInstruction(program, 0, 1, OpCode.ADD);
     haltInstrunction(program);
 
-    alu.execute(reg, mem, program);
+    exec();
 
     if (alu.halted && alu.fault != CpuFault.None) {
       // Possible That Alu Unit Error or Test Code Error
@@ -88,7 +94,7 @@ public class ALU_Tests {
     registerAndValueInstrunction(program, 0, 0, OpCode.LOADM);
     haltInstrunction(program);
 
-    alu.execute(reg, mem, program);
+    exec();
 
     if (alu.halted && alu.fault == CpuFault.INVALID_MEM) {
       throw new RuntimeException(
@@ -107,6 +113,8 @@ public class ALU_Tests {
     singleInstrunction(program, 3, OpCode.JMP);
     haltInstrunction(program);
 
+    exec();
+
     if (alu.halted && alu.fault != CpuFault.None) {
       throw new RuntimeException(
           "ALU Unit is halted, something wrong with jump instruction in test code");
@@ -121,6 +129,8 @@ public class ALU_Tests {
     singleInstrunction(program, 6, OpCode.JZ);
     singleInstrunction(program, 3, OpCode.JMP);
     haltInstrunction(program);
+
+    exec();
 
     if (alu.halted && alu.fault != CpuFault.None) {
       throw new RuntimeException(
@@ -137,6 +147,8 @@ public class ALU_Tests {
     registerAndValueInstrunction(program, 2, 1, OpCode.LOAD);
     haltInstrunction(program);
 
+    exec();
+
     if (alu.halted && alu.fault != CpuFault.None) {
       throw new RuntimeException(
           "ALU Unit is halted, something wrong with jump not zero instruction in test code");
@@ -149,6 +161,8 @@ public class ALU_Tests {
     registerAndValueInstrunction(program, 1, 1, OpCode.LOAD);
     bothRegisterInstruction(program, 0, 1, OpCode.CMP);
     haltInstrunction(program);
+
+    exec();
 
     if (alu.halted && alu.fault != CpuFault.None) {
       throw new RuntimeException(
@@ -168,9 +182,49 @@ public class ALU_Tests {
     bothRegisterInstruction(program, 0, 1, OpCode.SUB);
     haltInstrunction(program);
 
+    exec();
+
+    if (alu.halted && alu.fault != CpuFault.None && reg.r[0] != 0) {
+      throw new RuntimeException(
+          "ALU Unit is halted, something wrong with SUB instruction in test code");
+    }
+  }
+
+  @Test
+  public void jumpIfGreaterTest() {
+    registerAndValueInstrunction(program, 0, 1, OpCode.LOAD);
+    registerAndValueInstrunction(program, 1, 4, OpCode.LOAD);
+    bothRegisterInstruction(program, 0, 1, OpCode.CMP);
+    singleInstrunction(program, 6, OpCode.JG);
+    registerAndValueInstrunction(program, 1, 2, OpCode.LOAD);
+    haltInstrunction(program);
+
+    exec();
+
     if (alu.halted && alu.fault != CpuFault.None) {
       throw new RuntimeException(
-          "ALU Unit is halted, something wrong with cmp instruction in test code");
+          "ALU Unit is halted, something wrong with JG instruction in test code");
+    }
+  }
+
+  @Test
+  public void jumpIfLessTest() {
+    registerAndValueInstrunction(program, 0, 1, OpCode.LOAD);
+    registerAndValueInstrunction(program, 1, 4, OpCode.LOAD);
+    bothRegisterInstruction(program, 0, 1, OpCode.CMP);
+    singleInstrunction(program, 6, OpCode.JL);
+    registerAndValueInstrunction(program, 1, 2, OpCode.LOAD);
+    haltInstrunction(program);
+
+    exec();
+
+    if (alu.halted && alu.fault != CpuFault.None) {
+      throw new RuntimeException(
+          "ALU Unit is halted, something wrong with JL instruction in test code");
+    }
+    if (alu.flag.negative == false) {
+      throw new RuntimeException(
+          "ALU Unit is halted, something wrong with JL instruction in test code");
     }
   }
 }

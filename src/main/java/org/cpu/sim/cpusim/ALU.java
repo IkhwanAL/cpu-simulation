@@ -19,6 +19,7 @@ public class ALU {
 
     switch (inst.opcode) {
       case LOAD:
+      case SUB:
       case STOREM:
       case LOADM:
       case ADD: // register to register
@@ -35,6 +36,13 @@ public class ALU {
         break;
       case JL:
         if (flag.negative) {
+          programCounter = inst.dest - 1;
+        } else {
+          programCounter++;
+        }
+        break;
+      case JG:
+        if (flag.zero == false && flag.negative == false) {
           programCounter = inst.dest - 1;
         } else {
           programCounter++;

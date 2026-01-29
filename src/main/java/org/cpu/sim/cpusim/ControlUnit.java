@@ -180,6 +180,7 @@ public class ControlUnit {
         instruction.dest = resolveInstruction(ins.dest);
         instruction.src = resolveInstruction(ins.src);
         break;
+      case JG:
       case JNZ:
       case JL:
       case JZ:
