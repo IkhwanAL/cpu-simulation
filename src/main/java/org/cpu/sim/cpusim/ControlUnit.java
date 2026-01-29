@@ -17,7 +17,8 @@ public class ControlUnit {
   }
 
   void fetchProgram(String program) {
-    programInstruction = Arrays.stream(program.split("\r\n"));
+    var osLineSeparator = System.getProperty("line.separator");
+    programInstruction = Arrays.stream(program.split(osLineSeparator));
   }
 
   ArrayList<Instruction> decode() {
@@ -125,6 +126,8 @@ public class ControlUnit {
   }
 
   private int resolveInstruction(Operand op) {
+
+    // Convert to Number
     if (op instanceof LabelRef label) {
       Integer addr = labels.get(label.name());
 
@@ -135,14 +138,17 @@ public class ControlUnit {
       return addr;
     }
 
+    // Convert to Number
     if (op instanceof HexCode hx) {
       return Integer.decode(hx.value());
     }
 
+    // Convert to Number
     if (op instanceof Immediate imm) {
       return imm.value();
     }
 
+    // Convert to Number
     if (op instanceof RegisterCode rc) {
       return parseRegister(rc.value());
     }

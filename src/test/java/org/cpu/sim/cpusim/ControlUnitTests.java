@@ -76,4 +76,26 @@ public class ControlUnitTests {
       throw new RuntimeException("Control Unit Give an Incorrect Instruction When Add Label");
     }
   }
+
+  void decodeLoop() {
+    var program = """
+        LOAD A, 1
+        LOAD B, 1
+
+        loop:
+        ADD A, B
+        CMP A, 7
+        JZ exit
+        JMP loop
+
+        exit:
+        HALT
+        """;
+    cu.fetchProgram(program);
+    var list = cu.decode();
+
+    if (list.size() != 7) {
+      throw new RuntimeException("Control Unit Give an Incorrect Instruction When Add Label");
+    }
+  }
 }

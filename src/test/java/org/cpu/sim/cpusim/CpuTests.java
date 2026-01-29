@@ -12,25 +12,37 @@ public class CpuTests {
   }
 
   @Test
-  void testParseAndExecute() {
-    var program = "LOAD A, 4\r\n" +
-        "LOAD B, 1\r\n" +
-        "JMP skip\r\n" +
-        "LOAD C, 1\r\n" +
-        "LOAD D, 2\r\n" +
-        "skip:\r\n" +
-        "ADD A, B\r\n" +
-        "HALT\r\n";
+  void testLoop() {
+    var program = """
+        LOAD A, 1
+        LOAD B, 1
+        LOAD C, 7
+
+        loop:
+        ADD A, B
+        CMP A, C
+        JZ exit
+        JMP loop
+
+        exit:
+        HALT
+        """;
 
     cpu.cu.fetchProgram(program);
-    cpu.program = cpu.cu.decode();
+    var list = cpu.cu.decode();
 
-    while (!cpu.alu.halted) {
-      cpu.tick();
-    }
+    cpu.program = list;
 
-    if (cpu.alu.fault != CpuFault.None) {
-      throw new RuntimeException("Something Wrong When Execute After Parse");
+    try {
+      while (!cpu.alu.halted) {
+        cpu.tick();
+      }
+
+      if (cpu.alu.fault != CpuFault.None) {
+        throw new RuntimeException("The Cpu Halted With Status of :" + cpu.alu.fault);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Something Wrong When Try To Create Simple Loop Program" + e.getMessage());
     }
   }
 }

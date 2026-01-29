@@ -7,6 +7,7 @@ body {
 
 textarea {
   width: 100%;
+  box-sizing: border-box;
   background: #000;
   color: #0f0;
 }
@@ -33,4 +34,20 @@ textarea {
 
 .text-error {
   color: red;
+}
+
+.view {
+  display: flex;
+  gap: 4;
+}
+
+.editor {
+  min-width: 0;
+  box-sizing: border-box;
+  flex: 0 0 75%;
+}
+
+.helper {
+  margin-left: 1rem;
+  flex: 1;
 }

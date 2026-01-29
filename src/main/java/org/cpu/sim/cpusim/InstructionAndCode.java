@@ -25,6 +25,7 @@ class Instruction {
 class Flags {
   Boolean zero;
   Boolean negative;
+  Boolean carry;
 }
 
 sealed interface Operand permits Immediate, LabelRef, HexCode, RegisterCode {

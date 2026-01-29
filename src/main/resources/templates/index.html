@@ -11,18 +11,41 @@
 <body>
   <h1 th:text="${title}">CPU Simulator</h1>
   <form th:action="@{/compile-run}" method="post">
-    <div id="editor">
-      <h2>Program</h2>
-      <textarea name="program" th:text="${program}" cols="80" rows="10" id="program" placeholder="LOAD A, 1
-LOAD B, 2
-STORE A, 0x001
-HALT">
-      </textarea>
+    <h2>Program</h2>
+    <div class="view">
+      <div class="editor">
+        <textarea name="program" th:text="${program}" rows="15" id="program">
+        </textarea>
+      </div>
+      <div class="helper">
+        <p>List Of Available Instruction</p>
+        <p>Every Instruction is Case Sensitive and Space / Comma Sensitive</p>
+        <ul>
+          <li>LOAD [Register], [Value]</li>
+          <li>ADD [Register], [Register]</li>
+          <li>CMP [Register], [Register]</li>
+          <li>JZ [label | Instruction Line]</li>
+          <li>LOADM [Memory Index], [Register]</li>
+          <li>STOREM [Register], [Memory Index]</li>
+          <li>HALT</li>
+          <li>[label]:</li>
+        </ul>
+        <p>Comment can be add after instruction or below / after instruction e.g</p>
+        <div>
+          LOAD A, 1 ; this is comment
+        </div>
+        <div>
+          or
+        </div>
+        <div>
+          ; this is comment <br>
+          LOAD A, 1
+        </div>
+      </div>
     </div>
     <div>
-      <button type=" submit">Compile & Run</button>
+      <button type="submit">Compile & Run</button>
     </div>
-
   </form>
   <div class="error-box">
     <p th:text="${error}" class="text-error"></p>

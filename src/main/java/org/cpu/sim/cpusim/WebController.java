@@ -18,13 +18,6 @@ public class WebController {
     return "index";
   }
 
-  void parseInstruction(String line) {
-    if (line.isBlank()) {
-      return;
-    }
-
-  }
-
   private void setModel(Cpu cpu, String program, Model model) {
     model.addAttribute("title", "Cpu Simulator");
     model.addAttribute("registerA", cpu.reg.r[0]);
