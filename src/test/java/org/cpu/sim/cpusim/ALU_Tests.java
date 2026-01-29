@@ -38,6 +38,15 @@ public class ALU_Tests {
     instructions.add(instruction);
   }
 
+  private void cmpInstrunction(ArrayList<Instruction> instructions, int opA, int opB) {
+    var instruction = new Instruction();
+    instruction.opcode = OpCode.CMP;
+    instruction.dest = opA;
+    instruction.src = opB;
+
+    instructions.add(instruction);
+  }
+
   private void addInstrunction(ArrayList<Instruction> instructions, int opA, int opB) {
     var instruction = new Instruction();
     instruction.opcode = OpCode.ADD;
@@ -136,6 +145,24 @@ public class ALU_Tests {
     if (alu.halted && alu.fault != CpuFault.None) {
       throw new RuntimeException(
           "ALU Unit is halted, something wrong with jump instruction in test code");
+    }
+  }
+
+  @Test
+  public void compareTest() {
+    loadInstrunction(program, 0, 1);
+    loadInstrunction(program, 1, 1);
+    cmpInstrunction(program, 0, 1);
+    haltInstrunction(program);
+
+    if (alu.halted && alu.fault != CpuFault.None) {
+      throw new RuntimeException(
+          "ALU Unit is halted, something wrong with cmp instruction in test code");
+    }
+
+    if (alu.halted && alu.flag.zero != true) {
+      throw new RuntimeException(
+          "ALU Unit is halted, something wrong with comparison failed");
     }
   }
 }

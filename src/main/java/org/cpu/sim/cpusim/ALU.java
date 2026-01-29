@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public class ALU {
   Boolean halted = false;
   CpuFault fault = CpuFault.None;
-  Boolean zeroFlag = false;
   Integer programCounter = 0;
+  Flags flag = new Flags();
 
   void execute(Register reg, Memory mem, ArrayList<Instruction> program) {
     if (programCounter < 0 || programCounter >= program.size()) {
@@ -23,11 +23,17 @@ public class ALU {
       case ADD: // register to register
         this.store(inst, reg, mem);
         break;
+      case CMP:
+        int temp = reg.r[inst.dest] - reg.r[inst.src];
+        flag.zero = (temp == 0);
+        flag.negative = (temp < 0);
+        programCounter++;
+        break;
       case JMP:
         programCounter = inst.dest - 1;
         break;
       case JZ:
-        if (zeroFlag) {
+        if (flag.zero) {
           programCounter = inst.dest - 1;
         } else {
           programCounter++;
@@ -57,7 +63,8 @@ public class ALU {
       case ADD:
         int res = reg.r[inst.dest] + reg.r[inst.src];
         reg.r[inst.dest] = res;
-        zeroFlag = (res == 0);
+        flag.zero = (res == 0);
+        flag.negative = (res < 0);
         programCounter++;
         break;
       case LOAD:

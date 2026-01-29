@@ -1,7 +1,7 @@
 package org.cpu.sim.cpusim;
 
 enum OpCode {
-  LOAD, STORE, ADD, JMP, HALT, JZ;
+  LOAD, STORE, ADD, JMP, HALT, JZ, CMP;
 
   static OpCode fromString(String cmd) {
     try {
@@ -20,6 +20,11 @@ class Instruction {
   OpCode opcode;
   int dest;
   int src;
+}
+
+class Flags {
+  Boolean zero;
+  Boolean negative;
 }
 
 sealed interface Operand permits Immediate, LabelRef, HexCode, RegisterCode {
