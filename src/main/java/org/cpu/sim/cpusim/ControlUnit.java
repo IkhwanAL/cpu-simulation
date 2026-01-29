@@ -148,7 +148,8 @@ public class ControlUnit {
       case JMP:
         instruction.dest = resolveInstruction(ins.dest);
         break;
-      case STORE:
+      case STOREM:
+      case LOADM:
         instruction.dest = resolveInstruction(ins.dest);
         instruction.src = resolveInstruction(ins.src);
         break;

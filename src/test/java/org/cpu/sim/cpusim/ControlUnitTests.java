@@ -13,7 +13,7 @@ public class ControlUnitTests {
 
   @Test
   void fetchProgramTest() {
-    var program = "LOAD A, 4\r\nCMP A, B\r\n";
+    var program = "LOAD A, 4\r\nCMP A, B\r\nSTOREM A, 0x001\r\nLOADM A, 0x001\r\n";
 
     cu.fetchProgram(program);
 

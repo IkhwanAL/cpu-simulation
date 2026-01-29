@@ -56,11 +56,20 @@ public class ALU_Tests {
     instructions.add(instruction);
   }
 
-  private void storeInstrunction(ArrayList<Instruction> instructions, int index) {
+  private void storeMemInstrunction(ArrayList<Instruction> instructions, int opA, int memIndex) {
     var instruction = new Instruction();
-    instruction.opcode = OpCode.STORE;
-    instruction.dest = index;
-    instruction.src = 0;
+    instruction.opcode = OpCode.STOREM;
+    instruction.dest = opA;
+    instruction.src = memIndex;
+
+    instructions.add(instruction);
+  }
+
+  private void loadMemInstrunction(ArrayList<Instruction> instructions, int opA, int memIndex) {
+    var instruction = new Instruction();
+    instruction.opcode = OpCode.LOADM;
+    instruction.dest = opA;
+    instruction.src = memIndex;
 
     instructions.add(instruction);
   }
@@ -108,9 +117,11 @@ public class ALU_Tests {
   }
 
   @Test
-  public void storeTest() {
+  public void storeAndLoadTest() {
     loadInstrunction(program, 0, 1);
-    storeInstrunction(program, 3);
+    loadInstrunction(program, 1, 4);
+    storeMemInstrunction(program, 1, 0);
+    loadMemInstrunction(program, 0, 0);
     haltInstrunction(program);
 
     alu.execute(reg, mem, program);
@@ -118,6 +129,11 @@ public class ALU_Tests {
     if (alu.halted && alu.fault == CpuFault.INVALID_MEM) {
       throw new RuntimeException(
           "ALU Unit is halted, something wrong with memory address decode function or memory is too small");
+    }
+
+    if (alu.halted && reg.r[0] != 4) {
+      throw new RuntimeException(
+          "ALU Unit is halted, incorrect value register A should be the same as register B");
     }
   }
 

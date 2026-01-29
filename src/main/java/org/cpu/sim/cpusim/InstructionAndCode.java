@@ -1,7 +1,7 @@
 package org.cpu.sim.cpusim;
 
 enum OpCode {
-  LOAD, STORE, ADD, JMP, HALT, JZ, CMP;
+  LOAD, ADD, JMP, HALT, JZ, CMP, LOADM, STOREM;
 
   static OpCode fromString(String cmd) {
     try {

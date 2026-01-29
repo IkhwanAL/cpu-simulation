@@ -19,7 +19,8 @@ public class ALU {
 
     switch (inst.opcode) {
       case LOAD:
-      case STORE:
+      case STOREM:
+      case LOADM:
       case ADD: // register to register
         this.store(inst, reg, mem);
         break;
@@ -51,7 +52,16 @@ public class ALU {
 
   private void store(Instruction inst, Register reg, Memory mem) {
     switch (inst.opcode) {
-      case STORE:
+      case LOADM:
+        if (inst.src > mem.ram.length) {
+          halted = true;
+          fault = CpuFault.INVALID_MEM;
+          break;
+        }
+        reg.r[inst.dest] = mem.ram[inst.src];
+        programCounter++;
+        break;
+      case STOREM:
         if (inst.src > mem.ram.length) {
           halted = true;
           fault = CpuFault.INVALID_MEM;
