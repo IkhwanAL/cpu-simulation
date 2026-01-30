@@ -25,12 +25,15 @@ public class WebController {
     model.addAttribute("registerC", cpu.reg.r[2]);
     model.addAttribute("registerD", cpu.reg.r[3]);
 
+    model.addAttribute("memorys", cpu.mem.ram);
+
     model.addAttribute("program", program);
   }
 
   @PostMapping("/compile-run")
   public String getInstruction(@RequestParam String program, Model model) {
     var cpu = new Cpu();
+    cpu.setMemory(new Memory());
 
     cpu.cu.fetchProgram(program);
 

@@ -51,3 +51,18 @@ textarea {
   margin-left: 1rem;
   flex: 1;
 }
+
+.flex-memory {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.box-memory {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid white;
+}

@@ -13,7 +13,7 @@ public class ControlUnitTests {
 
   @Test
   void fetchProgramTest() {
-    var program = "LOAD A, 4\r\nCMP A, B\r\nSTOREM A, 0x001\r\nLOADM A, 0x001\r\n";
+    var program = "LOAD A, 4\r\nCMP A, B\r\nSTOREM A, 0x001\r\nLOADM A, 0x001\r\nLOAD A, -1\r\n";
 
     cu.fetchProgram(program);
 
@@ -62,21 +62,24 @@ public class ControlUnitTests {
   void decodeWithLabelTest() {
     var program = "LOAD A, 4\r\n" +
         "LOAD B, 1\r\n" +
+        "PUSH A\r\n" +
         "JMP skip\r\n" +
         "LOAD C, 1\r\n" +
         "LOAD D, 2\r\n" +
         "skip:\r\n" +
         "ADD A, B\r\n" +
+        "POP A\r\n" +
         "HALT\r\n";
 
     cu.fetchProgram(program);
     var list = cu.decode();
 
-    if (list.size() != 7) {
+    if (list.size() != 7 + 2) {
       throw new RuntimeException("Control Unit Give an Incorrect Instruction When Add Label");
     }
   }
 
+  @Test
   void decodeLoop() {
     var program = """
         LOAD A, 1

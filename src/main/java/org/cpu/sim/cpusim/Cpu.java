@@ -17,12 +17,13 @@ public class Cpu {
 
   ControlUnit cu = new ControlUnit();
   Register reg = new Register();
-  ALU alu = new ALU();
+  ALU alu = new ALU(0);
 
   ArrayList<Instruction> program = new ArrayList<Instruction>();
 
   public void setMemory(Memory ram) {
     mem = ram;
+    alu.stackPointer = ram.ram.length;
   }
 
   public void tick() {

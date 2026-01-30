@@ -12,8 +12,8 @@ public class ControlUnit {
 
   class RawInstruction {
     OpCode opcode;
-    Operand dest;
-    Operand src;
+    Operand operandA;
+    Operand operandB;
   }
 
   void fetchProgram(String program) {
@@ -113,11 +113,11 @@ public class ControlUnit {
     }
 
     if (cmd.length > 1) {
-      ins.dest = parseOperand(cmd[1]);
+      ins.operandA = parseOperand(cmd[1]);
     }
 
     if (cmd.length > 2) {
-      ins.src = parseOperand(cmd[2]);
+      ins.operandB = parseOperand(cmd[2]);
     }
 
     instructionLine++;
@@ -125,9 +125,9 @@ public class ControlUnit {
     return ins;
   }
 
+  // Convert Any Operands into Number
   private int resolveInstruction(Operand op) {
 
-    // Convert to Number
     if (op instanceof LabelRef label) {
       Integer addr = labels.get(label.name());
 
@@ -138,17 +138,14 @@ public class ControlUnit {
       return addr;
     }
 
-    // Convert to Number
     if (op instanceof HexCode hx) {
       return Integer.decode(hx.value());
     }
 
-    // Convert to Number
     if (op instanceof Immediate imm) {
       return imm.value();
     }
 
-    // Convert to Number
     if (op instanceof RegisterCode rc) {
       return parseRegister(rc.value());
     }
@@ -162,29 +159,23 @@ public class ControlUnit {
     switch (ins.opcode) {
       case HALT:
         break;
-      case JMP:
-        instruction.dest = resolveInstruction(ins.dest);
-        break;
+      case LOAD:
       case STOREM:
       case LOADM:
-        instruction.dest = resolveInstruction(ins.dest);
-        instruction.src = resolveInstruction(ins.src);
-        break;
-      case LOAD:
-        instruction.dest = resolveInstruction(ins.dest);
-        instruction.src = resolveInstruction(ins.src);
-        break;
       case SUB:
       case CMP:
       case ADD:
-        instruction.dest = resolveInstruction(ins.dest);
-        instruction.src = resolveInstruction(ins.src);
+        instruction.operandA = resolveInstruction(ins.operandA);
+        instruction.operandB = resolveInstruction(ins.operandB);
         break;
+      case PUSH:
+      case POP:
+      case JMP:
       case JG:
       case JNZ:
       case JL:
       case JZ:
-        instruction.dest = resolveInstruction(ins.dest);
+        instruction.operandA = resolveInstruction(ins.operandA);
         break;
       case null:
       default:

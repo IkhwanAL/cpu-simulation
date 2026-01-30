@@ -14,17 +14,17 @@ public class ALU_Tests {
 
   @BeforeEach
   void setup() {
-    alu = new ALU();
-    reg = new Register();
     mem = new Memory();
+    alu = new ALU(mem.ram.length);
+    reg = new Register();
     program = new ArrayList<Instruction>();
   }
 
   private void haltInstrunction(ArrayList<Instruction> instructions) {
     var instruction = new Instruction();
     instruction.opcode = OpCode.HALT;
-    instruction.dest = 0;
-    instruction.src = 1;
+    instruction.operandA = 0;
+    instruction.operandB = 1;
 
     instructions.add(instruction);
   }
@@ -32,8 +32,8 @@ public class ALU_Tests {
   private void registerAndValueInstrunction(ArrayList<Instruction> instructions, int opA, int value, OpCode code) {
     var instruction = new Instruction();
     instruction.opcode = code;
-    instruction.dest = opA;
-    instruction.src = value;
+    instruction.operandA = opA;
+    instruction.operandB = value;
 
     instructions.add(instruction);
   }
@@ -41,8 +41,8 @@ public class ALU_Tests {
   private void bothRegisterInstruction(ArrayList<Instruction> instructions, int opA, int opB, OpCode code) {
     var instruction = new Instruction();
     instruction.opcode = code;
-    instruction.dest = opA;
-    instruction.src = opB;
+    instruction.operandA = opA;
+    instruction.operandB = opB;
 
     instructions.add(instruction);
   }
@@ -50,8 +50,8 @@ public class ALU_Tests {
   private void singleInstrunction(ArrayList<Instruction> instructions, int target, OpCode code) {
     var instruction = new Instruction();
     instruction.opcode = code;
-    instruction.dest = target;
-    instruction.src = 0;
+    instruction.operandA = target;
+    instruction.operandB = 0;
 
     instructions.add(instruction);
   }
@@ -225,6 +225,29 @@ public class ALU_Tests {
     if (alu.flag.negative == false) {
       throw new RuntimeException(
           "ALU Unit is halted, something wrong with JL instruction in test code");
+    }
+  }
+
+  @Test
+  public void pushPopTest() {
+    registerAndValueInstrunction(program, 0, 1, OpCode.LOAD);
+    singleInstrunction(program, 0, OpCode.PUSH);
+    registerAndValueInstrunction(program, 0, 4, OpCode.LOAD);
+    registerAndValueInstrunction(program, 1, 4, OpCode.LOAD);
+    bothRegisterInstruction(program, 0, 1, OpCode.ADD);
+    singleInstrunction(program, 0, OpCode.POP);
+    haltInstrunction(program);
+
+    exec();
+
+    if (alu.halted && alu.fault != CpuFault.None) {
+      throw new RuntimeException(
+          "ALU Unit is halted, something wrong with PUSH / POP instruction in test code");
+    }
+
+    if (reg.r[0] != 1) {
+      throw new RuntimeException(
+          "Something wrong with PUSH / POP instruction in test code, it does not POP or PUSH value from / to memory");
     }
   }
 }

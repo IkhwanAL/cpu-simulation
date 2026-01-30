@@ -14,12 +14,13 @@
     <h2>Program</h2>
     <div class="view">
       <div class="editor">
-        <textarea name="program" th:text="${program}" rows="15" id="program">
+        <textarea name="program" th:text="${program}" rows="25" id="program">
         </textarea>
       </div>
       <div class="helper">
         <p>List Of Available Instruction</p>
         <p>Every Instruction is Case Sensitive and Space / Comma Sensitive</p>
+        <p>New Instruction must put in new line</p>
         <ul>
           <li>LOAD [Register], [Value]</li>
           <li>ADD [Register], [Register]</li>
@@ -27,6 +28,8 @@
           <li>JZ [label | Instruction Line]</li>
           <li>LOADM [Memory Index], [Register]</li>
           <li>STOREM [Register], [Memory Index]</li>
+          <li>PUSH [Register]</li>
+          <li>POP [Register]</li>
           <li>HALT</li>
           <li>[label]:</li>
         </ul>
@@ -51,7 +54,7 @@
     <p th:text="${error}" class="text-error"></p>
   </div>
   <div id="terminal">
-    <h2>CPU State</h2>
+    <h2>Register State</h2>
     <div id="register">
       <div>
         Register A: <span th:text="${registerA}">0</span>
@@ -64,6 +67,12 @@
       </div>
       <div>
         Register D: <span th:text="${registerD}">0</span>
+      </div>
+    </div>
+    <h2>Memory State</h2>
+    <div class="flex-memory">
+      <div class="box-memory" th:each="mem: ${memorys}">
+        <span th:text="${mem}">0</span>
       </div>
     </div>
   </div>

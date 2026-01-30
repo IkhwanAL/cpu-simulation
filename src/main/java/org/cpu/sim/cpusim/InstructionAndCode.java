@@ -1,7 +1,7 @@
 package org.cpu.sim.cpusim;
 
 enum OpCode {
-  LOAD, ADD, JMP, HALT, JZ, CMP, LOADM, STOREM, JL, SUB, JNZ, JG;
+  LOAD, ADD, JMP, HALT, JZ, CMP, LOADM, STOREM, JL, SUB, JNZ, JG, PUSH, POP;
 
   static OpCode fromString(String cmd) {
     try {
@@ -13,13 +13,13 @@ enum OpCode {
 }
 
 enum CpuFault {
-  None, INVALID_PC, INVALID_MEM, ILLEGAL_INSTRUCTION
+  None, INVALID_PC, INVALID_MEM, ILLEGAL_INSTRUCTION, StackOverflow, StackUnderflow;
 }
 
 class Instruction {
   OpCode opcode;
-  int dest;
-  int src;
+  int operandA;
+  int operandB;
 }
 
 class Flags {
